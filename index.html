@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>星视度</title>
+    <style type="text/css">
+    body{
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .camera_area {
+      width: 480px;
+      height: 480px;
+      margin: 0 auto;
+      border: 1px dotted #e6e6e6;
+    }
+    .snapshot_area {
+      width: 1000px;
+      height: 480px;
+      margin: 0 auto;
+    }
+    .snapshot_area #snapshot_1 {
+      width: 240px;
+      height: 240px;
+      border: 1px dotted #e6e6e6;
+      float: left;
+    }
+    .snapshot_area #snapshot_2 {
+      width: 240px;
+      height: 240px;
+      border: 1px dotted #e6e6e6;
+      float: left;
+    }
+    .snapshot_area #snapshot_3 {
+      width: 240px;
+      height: 240px;
+      border: 1px dotted #e6e6e6;
+      float: left;
+    }
+    .snapshot_area #snapshot_4 {
+      width: 240px;
+      height: 240px;
+      border: 1px dotted #e6e6e6;
+      float: left;
+    }
+    </style>
+  </head>
+  <body onclick="startRecordImage()">
+    <div class="camera_area">
+      <img id="image">
+    </div>
+    <div class="snapshot_area" id="snapshot_area">
+      <img id="snapshot_1" onclick="removeImage(1)">
+      <img id="snapshot_2" onclick="removeImage(2)">
+      <img id="snapshot_3" onclick="removeImage(3)">
+      <img id="snapshot_4" onclick="removeImage(4)">
+    </div>
+    <script>
+      const ipcRenderer = require('electron').ipcRenderer;
+
+      ipcRenderer.on('opencv image', function (event, data) {
+        document.getElementById('image').src = 'data:image/  png;base64,' + data.image;
+      })
+
+      ipcRenderer.on('image recorded', function (event, data) {
+        document.getElementById('snapshot_1').src = 'data:image/  png;base64,' + data.image;        
+      })
+
+      ipcRenderer.on('snapshot', function (event, data) {
+        var i = data.sequence;
+        document.getElementById('snapshot_' + i).src = 'data:image/  png;base64,' + data.snapshot;
+      })
+
+      function removeImage(i){
+        document.getElementById("snapshot_" + i).src = null;
+        ipcRenderer.send('remove image', {
+          sequence: i
+        });
+      }
+
+      function startRecordImage(){
+        ipcRenderer.send('start record', 'record');
+      }
+    </script>
+  </body>
+</html>
